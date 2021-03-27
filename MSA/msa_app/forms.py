@@ -87,6 +87,6 @@ class SalesData(forms.ModelForm):
 
     class Meta:
         model = Sales
-        fields = ['customer_name', 'customer_number', 'medicine_ids', 'quantity']
+        fields = ['medicine_id', 'quantity']
 
 

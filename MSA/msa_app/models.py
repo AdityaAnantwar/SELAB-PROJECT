@@ -65,16 +65,18 @@ class Stock(models.Model):
         db_table = "stock_data"
 
 class Sales(models.Model):
-    customer_name = models.CharField(max_length=100, default = "default customer")
-    customer_number = models.BigIntegerField(null=True)
-    medicine_ids = models.CharField(max_length=100, default="MED")
+    medicine_id = models.CharField(max_length=100, default="MED")
     quantity = models.IntegerField(default=0)
-    bill = models.CharField(max_length=50, null=True, default="-")
-    amount = models.IntegerField(null=True)
 
     class Meta:
         db_table = "sales_data"
     
-    def __str__(self):
-        return self.customer_name + " - " + str(self.amount)
+class Bill(models.Model):
+    customer_name = models.CharField(max_length=100, default = "default customer")
+    customer_number = models.BigIntegerField(null=True)
+    amount = models.IntegerField(null=True)
+    bill_copy = models.CharField(max_length=50, null=True, default="Not available")
+
+    class Meta:
+        db_table = "bill_data"
 
