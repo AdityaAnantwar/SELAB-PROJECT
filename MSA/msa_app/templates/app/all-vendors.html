@@ -1,0 +1,27 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Vendors</h3>
+{% endblock %}
+{% block content %}
+    <table style="width:100%">
+        <tr>
+            <th>Vendor Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Address</th>
+            <th>Vendor ID</th>
+            <th>Medicine IDs</th>
+        </tr>
+        {% for vendor in vendors %}
+        <tr>
+            <td>{{vendor.vendor_name}}</td>
+            <td>{{vendor.email}}</td>
+            <td>{{vendor.mobile}}</td>
+            <td>{{vendor.address}}</td>
+            <td>{{vendor.vendor_id}}</td>
+            <td>{{vendor.medicine_ids}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

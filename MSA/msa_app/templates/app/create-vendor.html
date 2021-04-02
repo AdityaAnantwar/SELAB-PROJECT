@@ -1,15 +1,15 @@
 {% extends 'app/base.html' %}
 
 {%block title %}
-<h3>Create Medicine</h3>
+<h3>Create Vendor</h3>
 {% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
     <form method="POST" class="form-group">
         {% csrf_token %}
-        {{form_med|crispy}}
+        {{form_ven|crispy}}
         <button type="submit" class="btn btn-success">Register</button>
     </form>
     {% if err %}<p>{{err}}</p>{%endif%}
-    {% if med_id %}<p>{{med_id}}</p>{%endif%}
+    {% if ven_id %}<p>{{ven_id}}</p>{%endif%}
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import CreateEmployee, EmployeeData, MedicineData 
-from .models import Employee
+from .forms import CreateEmployee, EmployeeData, MedicineData, VendorData, StockData
+from .models import Employee, Medicine, Vendor, MedicineToVendor, Stock
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
@@ -86,11 +86,22 @@ def CreateMedicine(request):
     else:
         form_med = MedicineData(request.POST)
         if form_med.is_valid():
-            form_med.save()
-             
+            trade_name = form_med.cleaned_data['trade_name']
+            generic_name = form_med.cleaned_data['generic_name']
+            unit_sell_price = form_med.cleaned_data['unit_sell_price']
+            unit_purchase_price = form_med.cleaned_data['unit_purchase_price']
+
+            m = Medicine(trade_name=trade_name,generic_name=generic_name,unit_sell_price=unit_sell_price,unit_purchase_price=unit_purchase_price)
+            m.save()
+            id = m.id
+            med_id = "MED"+str(id)
+            m.medicine_id = med_id
+            m.save()
+            
             form_med = MedicineData()
             context ={
-            'form_med': form_med
+            'form_med': form_med,
+            'med_id': med_id
             }
             return render(request, 'app/create-medicine.html', context)
         else:
@@ -101,4 +112,121 @@ def CreateMedicine(request):
                 'err': err
             }
             return render(request, 'app/create-medicine.html', context)
+
+def CreateVendor(request):
+    if request.method != 'POST':
+        form_ven = VendorData()
+        context ={
+            'form_ven': form_ven
+        }
+        return render(request, 'app/create-vendor.html', context)
+    else:
+        form_ven = VendorData(request.POST)
+        if form_ven.is_valid():
+            vendor_name = form_ven.cleaned_data['vendor_name']
+            email = form_ven.cleaned_data['email']
+            mobile = form_ven.cleaned_data['mobile']
+            address = form_ven.cleaned_data['address']
+            medicine_ids = form_ven.cleaned_data['medicine_ids']
+
+            meds = medicine_ids.split(";")
+            for med in meds:
+                try:
+                    Medicine.objects.get(medicine_id=med)
+                except:
+                    form_ven = VendorData()
+                    context={
+                        'form_ven':form_ven,
+                        'err': "Medicine_id "+med+" not found"
+                    }
+                    return render(request, 'app/create-vendor.html', context)
+
+            v = Vendor(vendor_name=vendor_name,mobile=mobile,email=email,address=address, medicine_ids=medicine_ids)
+            v.save()
+            id = v.id
+            ven_id = "VEN"+str(id)
+            v.vendor_id = ven_id
+            v.save()
+
+            for m in meds:
+                k = MedicineToVendor(medicine_id=m, vendor_id=ven_id)
+                k.save()
             
+            form_ven = VendorData()
+            context ={
+            'form_ven': form_ven,
+            'ven_id': ven_id
+            }
+            return render(request, 'app/create-vendor.html', context)
+        else:
+            form_ven = VendorData()
+            err = form_ven.errors
+            context ={
+                'form_ven': form_ven,
+                'err': err
+            }
+            return render(request, 'app/create-medicine.html', context)
+
+def AddStock(request):
+    if request.method != 'POST':
+        form_stock = StockData()
+        context ={
+            'form_stock': form_stock
+        }
+        return render(request, 'app/add-stock.html', context)
+    else:
+        form_stock = StockData(request.POST)
+        if form_stock.is_valid():
+            medicine_id = form_stock.cleaned_data['medicine_id']
+            batch_id = form_stock.cleaned_data['batch_id']
+            quantity = form_stock.cleaned_data['quantity']
+            expiry_date = form_stock.cleaned_data['expiry_date']
+
+            try:
+                Medicine.objects.get(medicine_id=medicine_id)
+            except:
+                form_stock = StockData()
+                err = medicine_id + " is not valid"
+                context ={
+                'form_stock': form_stock,
+                'err': err
+                }
+                return render(request, 'app/add-stock.html', context)
+
+            s = Stock(medicine_id=medicine_id, batch_id=batch_id, quantity=quantity, expiry_date=expiry_date)
+            s.save()
+            
+            form_stock = StockData()
+            context ={
+            'form_stock': form_stock,
+            }
+            return render(request, 'app/add-stock.html', context)
+        else:
+            form_stock = StockData()
+            err = form_stock.errors
+            context ={
+                'form_stock': form_stock,
+                'err': err
+            }
+            return render(request, 'app/add-stock.html', context)
+            
+def TableMedicines(request):
+    medicines = Medicine.objects.all()
+    context = {
+        'medicines': medicines
+    }
+    return render(request, 'app/all-medicines.html', context)
+
+def TableVendors(request):
+    vendors = Vendor.objects.all()
+    context = {
+        'vendors': vendors
+    }
+    return render(request, 'app/all-vendors.html', context)
+
+def TableEmployees(request):
+    employees = Employee.objects.all()
+    context = {
+        'employees': employees
+    }
+    return render(request, 'app/all-employees.html', context)

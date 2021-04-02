@@ -1,0 +1,25 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Medicines</h3>
+{% endblock %}
+{% block content %}
+    <table style="width:100%">
+        <tr>
+            <th>Trade Name</th>
+            <th>Generic Name</th>
+            <th>Unit Sell Price</th>
+            <th>Unit Purchase Price</th>
+            <th>Medicine ID</th>
+        </tr>
+        {% for medicine in medicines %}
+        <tr>
+            <td>{{medicine.trade_name}}</td>
+            <td>{{medicine.generic_name}}</td>
+            <td>{{medicine.unit_sell_price}}</td>
+            <td>{{medicine.unit_purchase_price}}</td>
+            <td>{{medicine.medicine_id}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

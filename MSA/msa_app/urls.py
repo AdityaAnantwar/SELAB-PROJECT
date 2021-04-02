@@ -7,4 +7,9 @@ urlpatterns = [
     path('', views.HomePage, name='index'),
     path('createuser/', views.CreateUser, name='create-user'),
     path('createmed/', views.CreateMedicine, name='create-medicine'),
+    path('createven/', views.CreateVendor, name='create-vendor'),
+    path('addstock/', views.AddStock, name='add-stock'),
+    path('allmedicines/', views.TableMedicines, name='all-medicines'),
+    path('allvendors/', views.TableVendors, name='all-vendors'),
+    path('allemployees/', views.TableEmployees, name='all-employees'),
 ]
