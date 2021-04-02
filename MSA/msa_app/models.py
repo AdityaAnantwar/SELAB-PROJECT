@@ -10,7 +10,7 @@ class Employee(models.Model):
     gender = models.CharField(max_length=10)
     phone = models.BigIntegerField()
     address = models.CharField(max_length=200)
-    is_admin = models.BooleanField(default = False)
+    is_admin = models.BooleanField(default = False, null=True, blank=True)
     password = models.CharField(max_length=20)
     confirm_password = models.CharField(max_length=20, null=True)
 

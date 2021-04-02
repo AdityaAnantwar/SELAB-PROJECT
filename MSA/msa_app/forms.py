@@ -2,6 +2,7 @@ from django import forms
 from django.forms import widgets
 from .models import Employee, Medicine, Vendor, Stock, Sales
 from django.contrib.auth.models import User
+from bootstrap_datepicker_plus import DatePickerInput
 
 GENDER_CHOICES = (
     ('Male', 'Male'),
@@ -26,11 +27,11 @@ class EmployeeData(forms.ModelForm):
     first_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'eg.Abhijeet', 'required':'true'}), label='First Name', required=True)
     middle_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'eg.Kamal', 'required':'false'}), label='Middle Name', required=False)
     last_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'eg.Choudhary', 'required':'true'}), label='Last Name', required=True)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'required':'true'}), label='DOB', required=True)
+    date_of_birth = forms.DateField(label='DOB', required=True)
     gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.Select(attrs={'class':'form', 'required':'true'}), label='Gender', required=True)
     phone = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter mobile number', 'required':'true'}), label='Mobile Number', required=True)
     address = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Address here(200 characters)', 'required':'true'}), label='Address', required=True)
-    is_admin = forms.BooleanField(label='Admin', required=True)
+    is_admin = forms.BooleanField(label='Admin', required=False)
     password = forms.CharField(max_length=20,widget=forms.PasswordInput(attrs={'class': 'form-control', 'required': 'true', }),required=True,label='Password')
     confirm_password = forms.CharField(max_length=20,widget=forms.PasswordInput(attrs={'class': 'form-control', 'required': 'true', }),required=True,label='Confirm Password')
 
@@ -47,6 +48,9 @@ class EmployeeData(forms.ModelForm):
     class Meta:
         model = Employee
         fields = ['first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender', 'phone', 'address', 'is_admin', 'password', 'confirm_password']
+        widget = {
+            'date_of_birth': DatePickerInput
+        }
 
 class MedicineData(forms.ModelForm):
     trade_name = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Trade Name', 'required':'true'}), label='Trade Name', required=True)
