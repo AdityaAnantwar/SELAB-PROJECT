@@ -59,7 +59,6 @@ class Stock(models.Model):
     medicine_id = models.CharField(max_length=10, default="MED")
     batch_id = models.CharField(max_length=20, null=True)
     quantity = models.IntegerField(default=0)
-    threshold = models.IntegerField(default = 50, null=True)
     expiry_date = models.DateField(null=True)
 
     class Meta:
@@ -68,6 +67,7 @@ class Stock(models.Model):
 class Sales(models.Model):
     medicine_id = models.CharField(max_length=100, default="MED")
     quantity = models.IntegerField(default=0)
+    date = models.DateField(null=True)
 
     class Meta:
         db_table = "sales_data"
@@ -81,3 +81,18 @@ class Bill(models.Model):
     class Meta:
         db_table = "bill_data"
 
+class MedicineStock(models.Model):
+    medicine_id = models.CharField(max_length=100, default="MED")
+    stock = models.IntegerField(default=0)
+    threshold = models.IntegerField(default = 50, null=True)
+
+    class Meta:
+        db_table = "medicine_stock"
+
+class ExpiredMedicines(models.Model):
+    medicine_id = models.CharField(max_length=100, default="MED")
+    quantity = models.IntegerField(default=0)
+    expiry_date = models.DateField(null=True)
+
+    class Meta:
+        db_table = "expired_medicines"

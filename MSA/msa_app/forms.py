@@ -88,8 +88,12 @@ class SalesData(forms.ModelForm):
     customer_number = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter mobile number', 'required':'true'}), label='Customer Mobile Number', required=True)
     medicine_id = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Semicolon(;) seperated medicine IDs', 'required':'true'}), label='Medicine IDs', required=True)
     quantity = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'No. of units', 'required':'true'}), label='Quantity', required=True)
+    date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'required':'true'}), label='Todays Date', required=True)
 
     class Meta:
         model = Sales
-        fields = ['medicine_id', 'quantity']
+        fields = ['medicine_id', 'quantity', 'date']
 
+class RevenueProfit(forms.Form):
+    from_date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'required':'true'}), label='From:', required=True)
+    to_date = forms.DateField(widget=forms.DateInput(attrs={'class':'form-control', 'required':'true'}), label='To:', required=True)

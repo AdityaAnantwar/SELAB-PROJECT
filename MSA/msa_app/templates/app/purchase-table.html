@@ -1,0 +1,29 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Purchase Medicines</h3>
+{% endblock %}
+{% block content %}
+    <table style="width:100%">
+        <tr>
+            <th>Medicine ID</th>
+            <th>Available Stock</th>
+            <th>Threshold</th>
+            <th>Vendor ID</th>
+            <th>Number</th>
+            <th>Email</th>
+            <th>Address</th>
+        </tr>
+        {% for med in purchase_meds %}
+        <tr>
+            <td>{{meds.med_id}}</td>
+            <td>{{med.available_stock}}</td>
+            <td>{{med.threshold}}</td>
+            <td>{{med.ven_id}}</td>
+            <td>{{med.number}}</td>
+            <td>{{med.email}}</td>
+            <td>{{med.address}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

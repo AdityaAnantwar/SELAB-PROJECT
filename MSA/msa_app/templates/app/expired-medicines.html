@@ -1,0 +1,27 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Expired Medicines</h3>
+{% endblock %}
+{% block content %}
+    <table style="width:100%">
+        <tr>
+            <th>Medicine ID</th>
+            <th>Available Stock</th>
+            <th>Batch ID</th>
+            <th>Vendor ID</th>
+            <th>Email</th>
+            <th>Address</th>
+        </tr>
+        {% for med in expired_meds %}
+        <tr>
+            <td>{{meds.med_id}}</td>
+            <td>{{med.available_stock}}</td>
+            <td>{{med.batch_id}}</td>
+            <td>{{med.ven_id}}</td>
+            <td>{{med.ven_email}}</td>
+            <td>{{med.ven_address}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

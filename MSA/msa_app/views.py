@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import CreateEmployee, EmployeeData, MedicineData, VendorData, StockData
-from .models import Employee, Medicine, Vendor, MedicineToVendor, Stock
+from .forms import CreateEmployee, EmployeeData, MedicineData, RevenueProfit, VendorData, StockData
+from .models import Employee, ExpiredMedicines, Medicine, MedicineStock, Sales, Vendor, MedicineToVendor, Stock
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 
@@ -98,6 +98,9 @@ def CreateMedicine(request):
             med_id = "MED"+str(id)
             m.medicine_id = med_id
             m.save()
+
+            ms = MedicineStock(medicine_id=med_id)
+            ms.save()
             
             form_med = MedicineData()
             context ={
@@ -234,9 +237,121 @@ def TableEmployees(request):
     
 def TableExpired(request):
     all_stock = Stock.objects.all()
-    today = datetime.date.today("%y-%m-%d")
+    today = datetime.date.today()
 
+    today = today.strftime("%y-%m-%d")
+
+    expired = []
+
+    for stock in all_stock:
+        if stock.expiry_date <= today:
+            med_id = stock.medicine_id
+            ven_id = stock.vendor_id
+            batch_id = stock.batch_id
+            ms = MedicineStock.objects.get(medicine_id = stock.medicine_id)
+            available_stock = ms.stock - stock.quantity
+            v = Vendor.objects.get(vendor_id = stock.vendor_id)
+            ven_email = v.email
+            ven_address = v.address
+            expired.append({
+                'med_id': med_id,
+                'ven_id':ven_id,
+                'batch_id':batch_id,
+                'available_stock':available_stock,
+                'ven_email':ven_email,
+                'ven_address':ven_address
+            })
+            e = ExpiredMedicines(medicine_id = med_id, quantity = stock.quantity)
+            e.save()
     
+    context = {
+        'expired_meds': expired
+    }
+    return render(request, 'app/expired-medicines.html', context)
+
+def TablePurchase(request):
+    all_meds_stock = MedicineStock.objects.all()
+    
+    purchase = []
+
+    for med in all_meds_stock:
+        if med.stock <= med.threshold:
+            med_id = med.medicine_id
+            stock = med.stock
+            threshold = med.threshold
+            v = MedicineToVendor.objects.filter(medicine_id=med_id).first()
+            ven_id = v.vendor_id
+            v_info = Vendor(vendor_id=ven_id)
+            number = v_info.number
+            email = v_info.email
+            address = v_info.address
+            purchase.append({
+                'med_id':med_id,
+                'stock':stock,
+                'threshold':threshold,
+                'ven_id':ven_id,
+                'number':number,
+                'email':email,
+                'address':address
+            })
+
+    context = {
+        'purchase':purchase
+    }
+
+    return render(request, 'app/purchase-table.html', context)
+
+def RevenueProfitView(request):
+    if request.method == 'POST':
+        form = RevenueProfit(request.POST)
+        from_date = form.cleaned_data['from_date']
+        to_date = form.cleaned_data['to_date']
+
+        if to_date <= from_date:
+            context={
+                'form': RevenueProfit(),
+                'err': "To date should be after from date"
+            }
+            return render(request, 'app/revenue-profit.html', context)
+
+        sales = Sales.objects.all()
+        expired = ExpiredMedicines.objects.all()
+
+        revenue = profit = 0
+        try:
+            for sale in sales:
+                if sale.date > from_date and sale.date < to_date:
+                    sp = Medicine.objects.get(medicine_id=sale.medicine_id)
+                    cp = Medicine.objects.get(medicine_id=sale.medicine_id)
+                    revenue += sp*sale.quantity
+                    profit += (sp-cp)*sale.quantity
+            
+            for med in expired:
+                if med.expiry_date > from_date and med.expiry_date < to_date:
+                    cp = Medicine.objects.get(medicine_id=med.medicine_id)
+                    profit -= med.quantity*cp
+
+            form = RevenueProfit()
+            context={
+                'form':form,
+                'revenue':revenue,
+                'profit':profit
+            }
+            return render(request, 'app/revenue-profit.html', context)
+        except:
+            context={
+                'form':form,
+                'err':"Some error occured"
+            }
+            return render(request, 'app/revenue-profit.html', context)
+    else:
+        form = RevenueProfit()
+        return render(request, 'app/revenue-profit.html', {'form':form})
+
+
+
+        
+        
 
 # Authentication views
 
@@ -244,7 +359,7 @@ def EmployeeLogin(request):
     if request.method == 'POST':
         try:
             if request.session['username']:
-                return redirect('index')
+                return render(request, 'registration/index.html', {})
         except:
             if request.method == 'POST':
                 username = request.POST['username']
@@ -258,7 +373,7 @@ def EmployeeLogin(request):
                         request.session['username'] = username
                         emp = Employee.objects.get(user=user)
                         request.session['is_admin'] = emp.is_admin
-                        return redirect('index')
+                        return render(request, 'registration/index.html', {})
                     else:
                         context = {
                             'err':"Account is inactive"
