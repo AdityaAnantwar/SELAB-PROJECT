@@ -5,6 +5,7 @@ app_name = 'msa_app'
 
 urlpatterns = [
     path('', views.HomePage, name='index'),
+    path('login/', views.EmployeeLogin, name='login'),
     path('createuser/', views.CreateUser, name='create-user'),
     path('createmed/', views.CreateMedicine, name='create-medicine'),
     path('createven/', views.CreateVendor, name='create-vendor'),

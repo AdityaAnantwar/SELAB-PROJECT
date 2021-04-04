@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 
 from django.contrib.auth.decorators import login_required
 
+import datetime
 
 def HomePage(request):
     return render(request, 'app/index.html')
@@ -230,3 +231,47 @@ def TableEmployees(request):
         'employees': employees
     }
     return render(request, 'app/all-employees.html', context)
+    
+def TableExpired(request):
+    all_stock = Stock.objects.all()
+    today = datetime.date.today("%y-%m-%d")
+
+    
+
+# Authentication views
+
+def EmployeeLogin(request):
+    if request.method == 'POST':
+        try:
+            if request.session['username']:
+                return redirect('index')
+        except:
+            if request.method == 'POST':
+                username = request.POST['username']
+                password = request.POST['password']
+
+                user = authenticate(username=username,password=password)
+
+                if user:
+                    if user.is_active:
+                        login(request,user)
+                        request.session['username'] = username
+                        emp = Employee.objects.get(user=user)
+                        request.session['is_admin'] = emp.is_admin
+                        return redirect('index')
+                    else:
+                        context = {
+                            'err':"Account is inactive"
+                        }
+                        return render(request, 'registration/login.html', context)
+                else:
+                    context = {
+                        'err':"Invalid credentials"
+                    }
+                    return render(request, 'registration/login.html', context)
+            else:
+                return render(request, 'registartion/login.html')
+    else:
+        return render(request, 'registration/login.html', {})
+
+

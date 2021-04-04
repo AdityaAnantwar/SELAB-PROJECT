@@ -93,4 +93,3 @@ class SalesData(forms.ModelForm):
         model = Sales
         fields = ['medicine_id', 'quantity']
 
-

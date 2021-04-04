@@ -55,6 +55,7 @@ class MedicineToVendor(models.Model):
         db_table = "vendor_to_medicine"
 
 class Stock(models.Model):
+    vendor_id = models.CharField(max_length=10, default="VEN")
     medicine_id = models.CharField(max_length=10, default="MED")
     batch_id = models.CharField(max_length=20, null=True)
     quantity = models.IntegerField(default=0)
