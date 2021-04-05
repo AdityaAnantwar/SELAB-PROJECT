@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Edit Vendor</h3>
+{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+<p>{{id}}</p>
+    <form action = "/app/editvendor/{{id}}" method="POST" class="form-group">
+        {% csrf_token %}
+        {{form|crispy}}
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+    {% if err %}<p>{{err}}</p>{%endif%}
+{% endblock %}

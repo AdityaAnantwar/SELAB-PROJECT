@@ -4,7 +4,8 @@
 <h3>Vendors</h3>
 {% endblock %}
 {% block content %}
-    <table style="width:100%">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
+    <table style="width:100%" id="myTable">
         <tr>
             <th>Name</th>
             <th>DOB</th>
@@ -12,6 +13,7 @@
             <th>Phone</th>
             <th>Address</th>
             <th>Admin</th>
+            <th>Action</th>
         </tr>
         {% for employee in employees %}
         <tr>
@@ -21,6 +23,7 @@
             <td>{{employee.phone}}</td>
             <td>{{employee.address}}</td>
             <td>{{employee.is_admin}}</td>
+            <td><a href="/app/editemployee/{{employee.id}}">Edit</a></td>
         </tr>
         {% endfor %}
     </table>

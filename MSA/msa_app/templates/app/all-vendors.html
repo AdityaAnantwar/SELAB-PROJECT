@@ -4,23 +4,26 @@
 <h3>Vendors</h3>
 {% endblock %}
 {% block content %}
-    <table style="width:100%">
+<input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names..">
+    <table style="width:100%" id="myTable">
         <tr>
+            <th>Vendor ID</th>
             <th>Vendor Name</th>
             <th>Email</th>
             <th>Mobile</th>
             <th>Address</th>
-            <th>Vendor ID</th>
             <th>Medicine IDs</th>
+            <th>Action</th>
         </tr>
         {% for vendor in vendors %}
         <tr>
+            <td>{{vendor.vendor_id}}</td>
             <td>{{vendor.vendor_name}}</td>
             <td>{{vendor.email}}</td>
             <td>{{vendor.mobile}}</td>
             <td>{{vendor.address}}</td>
-            <td>{{vendor.vendor_id}}</td>
             <td>{{vendor.medicine_ids}}</td>
+            <td><a href="/app/editvendor/{{vendor.vendor_id}}">Edit</a></td>
         </tr>
         {% endfor %}
     </table>

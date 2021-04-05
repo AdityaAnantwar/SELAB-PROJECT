@@ -203,6 +203,7 @@ def AddStock(request):
             batch_id = form_stock.cleaned_data['batch_id']
             quantity = form_stock.cleaned_data['quantity']
             expiry_date = form_stock.cleaned_data['expiry_date']
+            vendor_id = form_stock.cleaned_data['vendor_id']
 
             try:
                 Medicine.objects.get(medicine_id=medicine_id)
@@ -214,8 +215,19 @@ def AddStock(request):
                 'err': err
                 }
                 return render(request, 'app/add-stock.html', context)
+            
+            try:
+                Vendor.objects.get(vendor_id=vendor_id)
+            except:
+                form_stock = StockData()
+                err = vendor_id + " is not valid"
+                context = {
+                    'form_stock': form_stock,
+                    'err': err
+                }
+                return render(request, 'app/add-stock.html', context)
 
-            s = Stock(medicine_id=medicine_id, batch_id=batch_id, quantity=quantity, expiry_date=expiry_date)
+            s = Stock(medicine_id=medicine_id, batch_id=batch_id, quantity=quantity, expiry_date=expiry_date, vendor_id=vendor_id)
             s.save()
             
             form_stock = StockData()
@@ -364,6 +376,149 @@ def RevenueProfitView(request):
         form = RevenueProfit()
         return render(request, 'app/revenue-profit.html', {'form':form})
 
+
+# edit stuff
+
+def EditMedicine(request, id):
+    if request.method == 'POST':
+        form = MedicineData(request.POST)
+        if form.is_valid():
+            trade_name = form.cleaned_data['trade_name']
+            generic_name = form.cleaned_data['generic_name']
+            unit_sell_price = form.cleaned_data['unit_sell_price']
+            unit_purchase_price = form.cleaned_data['unit_purchase_price']
+
+            m = Medicine.objects.get(medicine_id=id)
+            m.trade_name = trade_name
+            m.generic_name = generic_name
+            m.unit_sell_price = unit_sell_price
+            m.unit_purchase_price = unit_purchase_price
+            m.save()
+
+            return redirect('/app/allmedicines')
+
+        else:
+            form = MedicineData()
+            context = {
+                'form':form,
+                'err': form.errors,
+                'id':id
+            }
+            return render(request, 'app/edit-medicine.html',context)
+    else:
+        form = MedicineData()
+        context = {
+            'form':form,
+            'id':id
+        }
+        return render(request, 'app/edit-medicine.html', context)
+
+def EditVendor(request, id):
+    if request.method == 'POST':
+        form = VendorData(request.POST)
+        if form.is_valid():
+            vendor_name = form.cleaned_data['vendor_name']
+            email = form.cleaned_data['email']
+            mobile = form.cleaned_data['mobile']
+            address = form.cleaned_data['address']
+            medicine_ids = form.cleaned_data['medicine_ids']
+
+            meds = medicine_ids.split(";")
+            for med in meds:
+                try:
+                    Medicine.objects.get(medicine_id=med)
+                except:
+                    form_ven = VendorData()
+                    context={
+                        'form':form,
+                        'err': "Medicine ID "+med+" not found",
+                        'id':id
+                    }
+                    return render(request, 'app/edit-vendor.html', context)            
+
+            v = Vendor.objects.get(vendor_id=id)
+            v.vendor_name = vendor_name
+            v.email = email
+            v.mobile = mobile
+            v.address = address
+            v.medicine_ids = medicine_ids
+            v.save()
+
+            MedicineToVendor.objects.filter(vendor_id=id).delete()
+
+            for m in meds:
+                k = MedicineToVendor(medicine_id=m,vendor_id=id)
+                k.save()
+
+            return redirect('/app/allvendors')
+
+        else:
+            form = VendorData()
+            context = {
+                'form':form,
+                'err': form.errors,
+                'id':id
+            }
+            return render(request, 'app/edit-vendor.html',context)
+    else:
+        form = VendorData()
+        context = {
+            'form':form,
+            'id':id
+        }
+        return render(request, 'app/edit-vendor.html', context)
+
+def EditEmployee(request, id):
+    if request.method == 'POST':
+        user_form = CreateEmployee(request.POST)
+        employee_data_form = EmployeeData(request.POST)
+        if user_form.is_valid() and employee_data_form.is_valid():
+            username = user_form.cleaned_data['username']
+            email = user_form.cleaned_data['email']
+            first_name = employee_data_form.cleaned_data['first_name']
+            middle_name = employee_data_form.cleaned_data['middle_name']
+            last_name = employee_data_form.cleaned_data['last_name']
+            date_of_birth = employee_data_form.cleaned_data['date_of_birth']
+            gender = employee_data_form.cleaned_data['gender']
+            phone = employee_data_form.cleaned_data['phone']
+            address = employee_data_form.cleaned_data['address']
+            is_admin = employee_data_form.cleaned_data['is_admin']
+            password = employee_data_form.cleaned_data['password']
+            confirm_password = employee_data_form.cleaned_data['confirm_password']
+
+            prev = Employee.objects.get(id = id).user
+            prev_user = User.objects.get(username=prev.username)
+            prev_user.delete()
+
+            u = User(username=username, email=email)
+            u.set_password(password)
+            u.save()
+            e = Employee(user=u, first_name=first_name, middle_name=middle_name, last_name=last_name, date_of_birth=date_of_birth,
+                        gender=gender, phone=phone, address=address, is_admin=is_admin, password=password, confirm_password=confirm_password)
+            e.save()
+            return redirect('/app/allemployees') 
+        else:
+            form_user = CreateEmployee()
+            form_data = EmployeeData()
+            err1 = user_form.errors
+            err2 = employee_data_form.errors
+            context = {
+                'form_data': form_data,
+                'form_user': form_user,
+                'err1': err1,
+                'err2': err2,
+                'id':id
+            }
+            return render(request, 'app/edit-employee.html', context)
+    else:
+        form_user = CreateEmployee()
+        form_data = EmployeeData()
+        context = {
+            'form_user':form_user,
+            'form_data':form_data,
+            'id':id
+        }
+        return render(request, 'app/edit-employee.html', context)
 
 
         
