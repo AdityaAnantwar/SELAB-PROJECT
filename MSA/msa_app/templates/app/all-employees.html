@@ -15,7 +15,7 @@
         </tr>
         {% for employee in employees %}
         <tr>
-            <td>{{employee.first_name}}</td>
+            <td>{{employee.first_name}}&nbsp;{{employee.middle_name}}&nbsp;{{employee.last_name}}</td>
             <td>{{employee.date_of_birth}}</td>
             <td>{{employee.gender}}</td>
             <td>{{employee.phone}}</td>

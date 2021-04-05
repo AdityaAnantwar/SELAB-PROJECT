@@ -13,5 +13,7 @@ urlpatterns = [
     path('allmedicines/', views.TableMedicines, name='all-medicines'),
     path('allvendors/', views.TableVendors, name='all-vendors'),
     path('allemployees/', views.TableEmployees, name='all-employees'),
-    path('expiredmedicines/', views.TableExpired, name='expired-medicines')
+    path('expiredmedicines/', views.TableExpired, name='expired-medicines'),
+    path('purchasemedicines/', views.TablePurchase, name='purchase-medicines'),
+    path('revenueprofit/', views.RevenueProfitView, name='revenue-profit')
 ]

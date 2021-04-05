@@ -92,22 +92,31 @@ def CreateMedicine(request):
             unit_sell_price = form_med.cleaned_data['unit_sell_price']
             unit_purchase_price = form_med.cleaned_data['unit_purchase_price']
 
-            m = Medicine(trade_name=trade_name,generic_name=generic_name,unit_sell_price=unit_sell_price,unit_purchase_price=unit_purchase_price)
-            m.save()
-            id = m.id
-            med_id = "MED"+str(id)
-            m.medicine_id = med_id
-            m.save()
+            try:
+                t = Medicine.objects.get(generic_name=generic_name)
+                form_med = MedicineData()
+                context = {
+                    'form_med':form_med,
+                    'err':"Medicine " + generic_name+" already exists"
+                }
+                return render(request, 'app/create-medicine.html', context)
+            except:
+                m = Medicine(trade_name=trade_name,generic_name=generic_name,unit_sell_price=unit_sell_price,unit_purchase_price=unit_purchase_price)
+                m.save()
+                id = m.id
+                med_id = "MED"+str(id)
+                m.medicine_id = med_id
+                m.save()
 
-            ms = MedicineStock(medicine_id=med_id)
-            ms.save()
-            
-            form_med = MedicineData()
-            context ={
-            'form_med': form_med,
-            'med_id': med_id
-            }
-            return render(request, 'app/create-medicine.html', context)
+                ms = MedicineStock(medicine_id=med_id)
+                ms.save()
+                
+                form_med = MedicineData()
+                context ={
+                'form_med': form_med,
+                'med_id': med_id
+                }
+                return render(request, 'app/create-medicine.html', context)
         else:
             form_med = MedicineData()
             err = form_med.errors
@@ -133,35 +142,44 @@ def CreateVendor(request):
             address = form_ven.cleaned_data['address']
             medicine_ids = form_ven.cleaned_data['medicine_ids']
 
-            meds = medicine_ids.split(";")
-            for med in meds:
-                try:
-                    Medicine.objects.get(medicine_id=med)
-                except:
-                    form_ven = VendorData()
-                    context={
-                        'form_ven':form_ven,
-                        'err': "Medicine_id "+med+" not found"
-                    }
-                    return render(request, 'app/create-vendor.html', context)
+            try:
+                d = Vendor.objects.get(email=email)
+                form_ven = VendorData()
+                context = {
+                    'form_ven':form_ven,
+                    'err':"Vendor data already exists"
+                }
+                return render(request, 'app/create-vendor.html', context)
+            except:
+                meds = medicine_ids.split(";")
+                for med in meds:
+                    try:
+                        Medicine.objects.get(medicine_id=med)
+                    except:
+                        form_ven = VendorData()
+                        context={
+                            'form_ven':form_ven,
+                            'err': "Medicine_id "+med+" not found"
+                        }
+                        return render(request, 'app/create-vendor.html', context)
 
-            v = Vendor(vendor_name=vendor_name,mobile=mobile,email=email,address=address, medicine_ids=medicine_ids)
-            v.save()
-            id = v.id
-            ven_id = "VEN"+str(id)
-            v.vendor_id = ven_id
-            v.save()
+                v = Vendor(vendor_name=vendor_name,mobile=mobile,email=email,address=address, medicine_ids=medicine_ids)
+                v.save()
+                id = v.id
+                ven_id = "VEN"+str(id)
+                v.vendor_id = ven_id
+                v.save()
 
-            for m in meds:
-                k = MedicineToVendor(medicine_id=m, vendor_id=ven_id)
-                k.save()
-            
-            form_ven = VendorData()
-            context ={
-            'form_ven': form_ven,
-            'ven_id': ven_id
-            }
-            return render(request, 'app/create-vendor.html', context)
+                for m in meds:
+                    k = MedicineToVendor(medicine_id=m, vendor_id=ven_id)
+                    k.save()
+                
+                form_ven = VendorData()
+                context ={
+                'form_ven': form_ven,
+                'ven_id': ven_id
+                }
+                return render(request, 'app/create-vendor.html', context)
         else:
             form_ven = VendorData()
             err = form_ven.errors
@@ -238,8 +256,6 @@ def TableEmployees(request):
 def TableExpired(request):
     all_stock = Stock.objects.all()
     today = datetime.date.today()
-
-    today = today.strftime("%y-%m-%d")
 
     expired = []
 

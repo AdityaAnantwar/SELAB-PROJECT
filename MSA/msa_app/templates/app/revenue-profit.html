@@ -1,0 +1,16 @@
+{% extends 'app/base.html' %}
+
+{%block title %}
+<h3>Revenue and Profit</h3>
+{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <form method="POST" class="form-group">
+        {% csrf_token %}
+        {{form|crispy}}
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+    {% if err %}<p>{{err}}</p>{%endif%}
+    {% if revenue %}<p>Revenue: {{revenue}}</p>{% endif %}
+    {% if profit %}<p>Profit: {{profit}}</p>{% endif %}
+{% endblock %}
